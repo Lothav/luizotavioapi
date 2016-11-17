@@ -10,7 +10,10 @@ console.log('Server started on 8080');
 
 var rabbit = { x: 0, y: 0 };
 
+var players = [];
+
 wss.on('connection', function(ws) {
+    var player;
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
         rabbit.x = incommingMsg.x;
@@ -19,7 +22,11 @@ wss.on('connection', function(ws) {
             wss.clients[i].send(JSON.stringify(rabbit));
         }
     });
-    ws.send(JSON.stringify(rabbit));
+
+    ws.on('close', function close() {
+        console.log('disconnected');
+    });
+    ws.send(JSON.stringify(player));
 });
 
 // create a config to configure both pooling behavior
