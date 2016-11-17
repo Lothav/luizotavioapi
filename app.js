@@ -4,29 +4,39 @@ var app = express();
 var pg = require('pg'); /* Postgres */
 
 var WebSocketServer = require('ws').Server,
-    wss = new WebSocketServer({port: 8080});
+    wss = new WebSocketServer({ port: process.env.PORT });
 
 console.log('Server started on 8080');
 
-var rabbit = { x: 0, y: 0 };
 
-var players = [];
-
+var instance = [];
 wss.on('connection', function(ws) {
-    var player;
+    instance[ instance.length ] = {
+        index: instance.length,
+        player: {
+            x: 12,
+            y: 50
+        }
+    };
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
-        rabbit.x = incommingMsg.x;
-        rabbit.y = incommingMsg.y;
-        for(var i in wss.clients) {
-            wss.clients[i].send(JSON.stringify(rabbit));
+        instance[incommingMsg.index].player = {
+            x: incommingMsg.x,
+            y: incommingMsg.y
+        };
+        for( var i in wss.clients ) {
+            if( wss.clients.hasOwnProperty(i) ){
+                wss.clients[i].send(JSON.stringify(instance));
+            }
         }
     });
-
     ws.on('close', function close() {
         console.log('disconnected');
     });
-    ws.send(JSON.stringify(player));
+    ws.send(JSON.stringify({
+        instance: instance,
+        index: instance.length
+    }));
 });
 
 // create a config to configure both pooling behavior
