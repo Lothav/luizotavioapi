@@ -6,33 +6,30 @@ var pg = require('pg'); /* Postgres */
 var WebSocketServer = require('ws').Server,
     wss = new WebSocketServer({ port: process.env.PORT });
 
-var instance = [];
+var player = [];
 wss.on('connection', function(ws) {
-    var index = instance.length;
-    instance[ index ] = {
-        index: index,
-        player: {
-            x: 12,
-            y: 50
-        }
+    var index = player.length;
+    player[ index ] = {
+        x: 12,
+        y: 50
     };
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
-        instance[incommingMsg.index].player = {
+        player[incommingMsg.index] = {
             x: incommingMsg.x,
             y: incommingMsg.y
         };
         for( var i in wss.clients ) {
             if( wss.clients.hasOwnProperty(i) ){
-                wss.clients[i].send(JSON.stringify(instance));
+                wss.clients[i].send(JSON.stringify(player));
             }
         }
     });
-    ws.on('close', function close() {
-        console.log('disconnected');
+    ws.on('close', function close(close) {
+        console.log('disconnected', close);
     });
     ws.send(JSON.stringify({
-        instance: instance,
+        player: player,
         index: index
     }));
 });
