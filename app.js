@@ -1,7 +1,26 @@
 var express = require('express');
-var pg = require('pg');
-
 var app = express();
+
+var pg = require('pg'); /* Postgres */
+
+var WebSocketServer = require('ws').Server,
+    wss = new WebSocketServer({port: 8080});
+
+console.log('Server started on 8080');
+
+var rabbit = { x: 0, y: 0 };
+
+wss.on('connection', function(ws) {
+    ws.on('message', function(message) {
+        var incommingMsg = JSON.parse(message);
+        rabbit.x = incommingMsg.x;
+        rabbit.y = incommingMsg.y;
+        for(var i in wss.clients) {
+            wss.clients[i].send(JSON.stringify(rabbit));
+        }
+    });
+    ws.send(JSON.stringify(rabbit));
+});
 
 // create a config to configure both pooling behavior
 // and client options
@@ -50,10 +69,6 @@ pool.on('error', function (err, client) {
     console.error('idle client error', err.message, err.stack)
 });
 
-app.get('/', function (req, res) {
-    res.send('Hello World!');
-});
-var port = process.env.PORT || 3000;
-app.listen( port , function () {
-    console.log('Example app listening on port ' + port);
-});
+app.get('/', function (req, res) { res.send('Hello World!'); });
+var port = process.env.PORT || 8080;
+app.listen( 3000, function () { console.log('Listening on port ' + port); });
