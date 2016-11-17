@@ -4,15 +4,21 @@ var app = express();
 var pg = require('pg'); /* Postgres */
 
 var WebSocketServer = require('ws').Server,
-    wss = new WebSocketServer({ port: process.env.PORT });
+    wss = new WebSocketServer({ port: process.env.PORT || 8082 });
 
+console.log(process.env.PORT);
 var player = [];
+wss.keepAlive = true;
 wss.on('connection', function(ws) {
-    var index = player.length;
-    player[ index ] = {
+    var id = player.length;
+    var name = ws.protocol;
+    player.push({
+        id: id,
+        name: name,
         x: 12,
         y: 50
-    };
+    });
+
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
         player[incommingMsg.index] = {
@@ -25,12 +31,17 @@ wss.on('connection', function(ws) {
             }
         }
     });
-    ws.on('close', function close(close) {
-        console.log('disconnected', close);
+    ws.on('close', function (close) {
+        for(var i = 0; i < player.length; i++){
+            if(player[i].id == id){
+                player.splice(i, 1);
+                break;
+            }
+        }
+        console.log('player '+ name +' disconnected: ' + close);
     });
     ws.send(JSON.stringify({
-        player: player,
-        index: index
+        player: player
     }));
 });
 
@@ -62,5 +73,5 @@ pool.on('error', function (err, client) {
 });
 
 app.get('/', function (req, res) { res.send('Hello World!'); });
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 8082;
 app.listen( 3000, function () { console.log('Listening on port ' + port); });
