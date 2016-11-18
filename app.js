@@ -55,13 +55,13 @@ wss.on('connection', function(ws) {
         }
 
 
-            // while( wss.clients.length ){
-            /*for( i in wss.clients ) {
-                if( wss.clients.hasOwnProperty(i) ){
-                    wss.clients[i].send(JSON.stringify({ devil: devil }));
-                }
-            }*/
-            //}
+        // while( wss.clients.length ){
+        /*for( i in wss.clients ) {
+         if( wss.clients.hasOwnProperty(i) ){
+         wss.clients[i].send(JSON.stringify({ devil: devil }));
+         }
+         }*/
+        //}
 
     });
     ws.on('close', function (close) {
@@ -74,7 +74,7 @@ wss.on('connection', function(ws) {
         console.log('players '+ name +' disconnected: ' + close);
     });
     /*  Fist time connected : Send id to new players
-        and new players to the others playerss  */
+     and new players to the others playerss  */
     ws.send(JSON.stringify({ id: player_id }));
     for( i in wss.clients ) {
         if( wss.clients.hasOwnProperty(i) ){
@@ -86,7 +86,9 @@ wss.on('connection', function(ws) {
 
 function calcDevilLocation(){
     if(players.length){
-        if(players[0].x > devil.x){
+        var devil_to = Math.round(Math.random() * (wss.clients.length-1) );
+
+        if(players[devil_to].x > devil.x){
             devil.x++;
         }else{
             devil.x--;
@@ -96,30 +98,30 @@ function calcDevilLocation(){
 
 /*  Postgres DB */
 /*var config = {
-    host:'ec2-54-163-239-218.compute-1.amazonaws.com',
-    user: 'jhsjtrqfnpqkmu',
-    database: 'd1rtile2fnno07',
-    password: 'fFDFyNpsek9yRITY38q7-TdyAA',
-    port: 5432,
-    max: 10,
-    idleTimeoutMillis: 30000
-};
+ host:'ec2-54-163-239-218.compute-1.amazonaws.com',
+ user: 'jhsjtrqfnpqkmu',
+ database: 'd1rtile2fnno07',
+ password: 'fFDFyNpsek9yRITY38q7-TdyAA',
+ port: 5432,
+ max: 10,
+ idleTimeoutMillis: 30000
+ };
 
-var pool = new pg.Pool(config);
+ var pool = new pg.Pool(config);
 
-pool.connect(function(err, client, done) {
-    if(err) return console.error('error fetching client from pool', err);
-    client.query('SELECT $1::int AS number', ['1'], function(err, result) {
-        done();
-        if(err) return console.error('error running query', err);
+ pool.connect(function(err, client, done) {
+ if(err) return console.error('error fetching client from pool', err);
+ client.query('SELECT $1::int AS number', ['1'], function(err, result) {
+ done();
+ if(err) return console.error('error running query', err);
 
-        console.log(result.rows[0].number);
-        //output: 1
-    });
-});
+ console.log(result.rows[0].number);
+ //output: 1
+ });
+ });
 
-pool.on('error', function (err, client) {
-    console.error('idle client error', err.message, err.stack)
-});
+ pool.on('error', function (err, client) {
+ console.error('idle client error', err.message, err.stack)
+ });
 
-*/
+ */
