@@ -11,7 +11,7 @@ wss.keepAlive = true;
 
 wss.on('connection', function(ws) {
     var id = players.length, i,
-        name = ws.protocol;
+        name = ws.protocol || "Anonymous";
     players.push({
         id: id,
         name: name,
