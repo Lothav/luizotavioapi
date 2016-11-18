@@ -4,7 +4,7 @@ var app = express();
 var pg = require('pg'); /* Postgres */
 
 var WebSocketServer = require('ws').Server,
-    wss = new WebSocketServer({ server: app });
+    wss = new WebSocketServer({ server: app, port: 8082 });
 
 var players = [];
 wss.keepAlive = true;
