@@ -3,23 +3,24 @@ var express = require('express');
 var pg = require('pg'); /* Postgres */
 var path = require("path");
 
-const PORT = process.env.PORT || 3000;
-const INDEX = path.join(__dirname, 'index.html');
+var port = process.env.PORT || 3000;
+var index = path.join(__dirname, 'index.html');
 
 /*  Express Server  */
 
 var server = express()
-        .use(function(req, res) { res.sendFile(INDEX) })
-.listen(PORT, function(port) { console.log('Listening on ' + port)});
+    .use( function(req, res) { res.sendFile( index ) } )
+    .listen(port, function(p) { console.log('Listening on ' + p)});
 
 
 /*  Web Socket  */
 
 var wss = new WebSocketServer({ server : server });
+var id = 0;
 
 var players = [];
 wss.on('connection', function(ws) {
-    var id = players.length, i, name;
+    var i, name;
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
         /* First Mensage from player */
@@ -62,6 +63,7 @@ wss.on('connection', function(ws) {
             wss.clients[i].send(JSON.stringify({ players: players }));
         }
     }
+    id++;
 });
 
 
