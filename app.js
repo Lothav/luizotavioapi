@@ -24,7 +24,7 @@ wss.on('connection', function(ws) {
         id: id,
         name: name,
         x: 800,
-        y: 70
+        y: 500
     });
 
     ws.on('message', function(message) {
