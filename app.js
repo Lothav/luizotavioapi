@@ -6,43 +6,51 @@ var pg = require('pg'); /* Postgres */
 var WebSocketServer = require('ws').Server,
     wss = new WebSocketServer({ port: process.env.PORT || 8082 });
 
-console.log(process.env.PORT);
-var player = [];
+var players = [];
 wss.keepAlive = true;
+
 wss.on('connection', function(ws) {
-    var id = player.length;
-    var name = ws.protocol;
-    player.push({
+    var id = players.length, i,
+        name = ws.protocol;
+    players.push({
         id: id,
         name: name,
-        x: 12,
-        y: 50
+        x: 800,
+        y: 70
     });
 
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
-        player[incommingMsg.index] = {
-            x: incommingMsg.x,
-            y: incommingMsg.y
-        };
-        for( var i in wss.clients ) {
+
+        for (i in players)
+            if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
+                players[i].x = incommingMsg.x;
+                players[i].y = incommingMsg.y;
+                break;
+            }
+        for( i in wss.clients ) {
             if( wss.clients.hasOwnProperty(i) ){
-                wss.clients[i].send(JSON.stringify(player));
+                wss.clients[i].send(JSON.stringify({ players: players }));
             }
         }
     });
     ws.on('close', function (close) {
-        for(var i = 0; i < player.length; i++){
-            if(player[i].id == id){
-                player.splice(i, 1);
+        for(var i = 0; i < players.length; i++){
+            if(players[i].id == id){
+                players.splice(i, 1);
                 break;
             }
         }
-        console.log('player '+ name +' disconnected: ' + close);
+        console.log('players '+ name +' disconnected: ' + close);
     });
-    ws.send(JSON.stringify({
-        player: player
-    }));
+    /*  Fist time connected : Send id to new players
+        and new players to the others playerss  */
+    ws.send(JSON.stringify({ id: id }));
+    for( i in wss.clients ) {
+        if( wss.clients.hasOwnProperty(i) ){
+            wss.clients[i].send(JSON.stringify({ players: players }));
+        }
+    }
 });
 
 var config = {
@@ -73,5 +81,5 @@ pool.on('error', function (err, client) {
 });
 
 app.get('/', function (req, res) { res.send('Hello World!'); });
-var port = process.env.PORT || 8082;
-app.listen( 3000, function () { console.log('Listening on port ' + port); });
+var port = process.env.PORT || 8080;
+app.listen( port, function () { console.log('Listening on port ' + port); });
