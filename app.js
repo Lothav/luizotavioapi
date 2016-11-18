@@ -2,10 +2,9 @@ var express = require('express');
 var app = express();
 
 var pg = require('pg'); /* Postgres */
-var port = process.env.PORT || 8080;
 
 var WebSocketServer = require('ws').Server,
-    wss = new WebSocketServer({ server: app, port: port });
+    wss = new WebSocketServer({ server: app });
 
 var players = [];
 wss.keepAlive = true;
@@ -81,5 +80,6 @@ pool.on('error', function (err, client) {
     console.error('idle client error', err.message, err.stack)
 });
 
+var port = process.env.PORT || 8080;
 app.get('/', function (req, res) { res.send('Hello World!'); });
 app.listen( port, function () { console.log('Listening on port ' + port); });
