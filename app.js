@@ -19,19 +19,25 @@ var wss = new WebSocketServer({ server : server });
 var id = 0;
 
 var players = [];
+var devil = {
+    x: 64,
+    y: 80
+};
 wss.on('connection', function(ws) {
     var i, name;
+    var player_id = id++;
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
         /* First Mensage from player */
         if( incommingMsg.name !== undefined ){
             name = incommingMsg.name;
             players.push({
-                id: id,
+                id: player_id,
                 name: name,
                 x: 800,
                 y: 500
             });
+            ws.send(JSON.stringify({ devil: devil }));
         } else {
             for (i in players)
                 if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
@@ -39,16 +45,28 @@ wss.on('connection', function(ws) {
                     players[i].y = incommingMsg.y;
                     break;
                 }
+            calcDevilLocation();
+
             for( i in wss.clients ) {
                 if( wss.clients.hasOwnProperty(i) ){
-                    wss.clients[i].send(JSON.stringify({ players: players }));
+                    wss.clients[i].send(JSON.stringify({ players: players,devil: devil }));
                 }
             }
         }
+
+
+            // while( wss.clients.length ){
+            /*for( i in wss.clients ) {
+                if( wss.clients.hasOwnProperty(i) ){
+                    wss.clients[i].send(JSON.stringify({ devil: devil }));
+                }
+            }*/
+            //}
+
     });
     ws.on('close', function (close) {
         for(var i = 0; i < players.length; i++){
-            if(players[i].id == id){
+            if(players[i].id == player_id){
                 players.splice(i, 1);
                 break;
             }
@@ -57,18 +75,27 @@ wss.on('connection', function(ws) {
     });
     /*  Fist time connected : Send id to new players
         and new players to the others playerss  */
-    ws.send(JSON.stringify({ id: id }));
+    ws.send(JSON.stringify({ id: player_id }));
     for( i in wss.clients ) {
         if( wss.clients.hasOwnProperty(i) ){
             wss.clients[i].send(JSON.stringify({ players: players }));
         }
     }
-    id++;
+
 });
 
+function calcDevilLocation(){
+    if(players.length){
+        if(players[0].x > devil.x){
+            devil.x++;
+        }else{
+            devil.x--;
+        }
+    }
+}
 
 /*  Postgres DB */
-var config = {
+/*var config = {
     host:'ec2-54-163-239-218.compute-1.amazonaws.com',
     user: 'jhsjtrqfnpqkmu',
     database: 'd1rtile2fnno07',
@@ -95,4 +122,4 @@ pool.on('error', function (err, client) {
     console.error('idle client error', err.message, err.stack)
 });
 
-
+*/
