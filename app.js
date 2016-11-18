@@ -10,24 +10,13 @@ var server = express()
         .use(function(req, res) { res.sendFile(INDEX) })
 .listen(PORT, function(port) { console.log('Listening on ' + port)});
 
-/*
-var app = express();
-var port = process.env.PORT || 5000;
 
-app.use(express.static(__dirname + "/"));
 
-var server = http.createServer(app);
-server.listen(port, function(){console.log('port:' + port)});
-
-//app.listen( port, function () { console.log('Listening on port ' + port); });
-app.get('/', function (req, res) { res.send('Hello World!'); });
-*/
 /*  Web Socket  */
 
 var wss = new WebSocketServer({ server : server });
 
 var players = [];
-wss.keepAlive = true;
 wss.on('connection', function(ws) {
     var id = players.length, i,
         name = ws.protocol || "Anonymous";
