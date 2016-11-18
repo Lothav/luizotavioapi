@@ -1,16 +1,22 @@
 var WebSocketServer = require('ws').Server;
 var express = require('express');
 var pg = require('pg'); /* Postgres */
+var http = require("http");
 
 var app = express();
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 5000;
 
+app.use(express.static(__dirname + "/"));
+
+var server = http.createServer(app);
+server.listen(port);
+
+//app.listen( port, function () { console.log('Listening on port ' + port); });
 app.get('/', function (req, res) { res.send('Hello World!'); });
-app.listen( port, function () { console.log('Listening on port ' + port); });
 
 /*  Web Socket  */
 
-var wss = new WebSocketServer({ server: app });
+var wss = new WebSocketServer({ port: 3000 });
 
 var players = [];
 wss.keepAlive = true;
