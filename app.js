@@ -19,26 +19,29 @@ var wss = new WebSocketServer({ server : server });
 
 var players = [];
 wss.on('connection', function(ws) {
-    var id = players.length, i,
-        name = ws.protocol || "Anonymous";
-    players.push({
-        id: id,
-        name: name,
-        x: 800,
-        y: 500
-    });
+    var id = players.length, i, name;
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
-
-        for (i in players)
-            if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
-                players[i].x = incommingMsg.x;
-                players[i].y = incommingMsg.y;
-                break;
-            }
-        for( i in wss.clients ) {
-            if( wss.clients.hasOwnProperty(i) ){
-                wss.clients[i].send(JSON.stringify({ players: players }));
+        /* First Mensage from player */
+        if( incommingMsg.name !== undefined ){
+            name = incommingMsg.name;
+            players.push({
+                id: id,
+                name: name,
+                x: 800,
+                y: 500
+            });
+        } else {
+            for (i in players)
+                if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
+                    players[i].x = incommingMsg.x;
+                    players[i].y = incommingMsg.y;
+                    break;
+                }
+            for( i in wss.clients ) {
+                if( wss.clients.hasOwnProperty(i) ){
+                    wss.clients[i].send(JSON.stringify({ players: players }));
+                }
             }
         }
     });
