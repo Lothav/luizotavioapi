@@ -1,22 +1,30 @@
 var WebSocketServer = require('ws').Server;
 var express = require('express');
 var pg = require('pg'); /* Postgres */
-var http = require("http");
+var path = require("path");
 
+const PORT = process.env.PORT || 3000;
+const INDEX = path.join(__dirname, 'index.html');
+
+var server = express()
+        .use(function(req, res) { res.sendFile(INDEX) })
+.listen(PORT, function(port) { console.log('Listening on ' + port)});
+
+/*
 var app = express();
 var port = process.env.PORT || 5000;
 
 app.use(express.static(__dirname + "/"));
 
 var server = http.createServer(app);
-server.listen(port);
+server.listen(port, function(){console.log('port:' + port)});
 
 //app.listen( port, function () { console.log('Listening on port ' + port); });
 app.get('/', function (req, res) { res.send('Hello World!'); });
-
+*/
 /*  Web Socket  */
 
-var wss = new WebSocketServer({ port: 3000 });
+var wss = new WebSocketServer({ server : server });
 
 var players = [];
 wss.keepAlive = true;
