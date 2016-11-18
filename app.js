@@ -6,13 +6,11 @@ var path = require("path");
 const PORT = process.env.PORT || 3000;
 const INDEX = path.join(__dirname, 'index.html');
 
-
 /*  Express Server  */
 
 var server = express()
         .use(function(req, res) { res.sendFile(INDEX) })
 .listen(PORT, function(port) { console.log('Listening on ' + port)});
-
 
 
 /*  Web Socket  */
