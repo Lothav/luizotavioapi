@@ -1,14 +1,19 @@
+var WebSocketServer = require('ws').Server;
 var express = require('express');
-var app = express();
-
 var pg = require('pg'); /* Postgres */
 
-var WebSocketServer = require('ws').Server,
-    wss = new WebSocketServer({ server: app });
+var app = express();
+var port = process.env.PORT || 8080;
+
+app.get('/', function (req, res) { res.send('Hello World!'); });
+app.listen( port, function () { console.log('Listening on port ' + port); });
+
+/*  Web Socket  */
+
+var wss = new WebSocketServer({ server: app });
 
 var players = [];
 wss.keepAlive = true;
-
 wss.on('connection', function(ws) {
     var id = players.length, i,
         name = ws.protocol || "Anonymous";
@@ -53,6 +58,8 @@ wss.on('connection', function(ws) {
     }
 });
 
+
+/*  Postgres DB */
 var config = {
     host:'ec2-54-163-239-218.compute-1.amazonaws.com',
     user: 'jhsjtrqfnpqkmu',
@@ -80,6 +87,4 @@ pool.on('error', function (err, client) {
     console.error('idle client error', err.message, err.stack)
 });
 
-var port = process.env.PORT || 8080;
-app.get('/', function (req, res) { res.send('Hello World!'); });
-app.listen( port, function () { console.log('Listening on port ' + port); });
+
