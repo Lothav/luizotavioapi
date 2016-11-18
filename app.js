@@ -26,7 +26,6 @@ wss.on('connection', function(ws) {
         x: 800,
         y: 500
     });
-
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
 
