@@ -9,7 +9,7 @@ var index = path.join(__dirname, 'index.html');
 /*  Express Server  */
 
 var server = express()
-    .use( function(req, res) { res.sendFile( index ) } )
+//.use( function(req, res) { res.sendFile( index ) } )
     .listen(port, function(p) { console.log('Listening on ' + p)});
 
 
@@ -21,7 +21,8 @@ var id = 0;
 var players = [];
 var devil = {
     x: 64,
-    y: 80
+    y: 80,
+    follow_id: 0
 };
 wss.on('connection', function(ws) {
     var i, name;
@@ -53,7 +54,8 @@ wss.on('connection', function(ws) {
                 }
             }
         }
-
+        if(incommingMsg.devil !== undefined)
+            devil.y = incommingMsg.devil.y;
 
         // while( wss.clients.length ){
         /*for( i in wss.clients ) {
@@ -81,18 +83,14 @@ wss.on('connection', function(ws) {
             wss.clients[i].send(JSON.stringify({ players: players }));
         }
     }
-
 });
 
 function calcDevilLocation(){
     if(players.length){
-        var devil_to = Math.round(Math.random() * (wss.clients.length-1) );
-
-        if(players[devil_to].x > devil.x){
-            devil.x++;
-        }else{
-            devil.x--;
-        }
+        var devil_to = Math.round( Math.random() * (wss.clients.length-1) );
+        if( players[devil_to].x > devil.x ) devil.x++;
+        else devil.x--;
+        devil.follow_id = devil_to;
     }
 }
 
