@@ -90,7 +90,7 @@ function calcDevilLocation(){
         var devil_to = Math.round( Math.random() * (wss.clients.length-1) );
         if( players[devil_to].x > devil.x ) devil.x++;
         else devil.x--;
-        devil.follow_id = devil_to;
+        devil.follow_id = players[devil_to].id;
     }
 }
 
