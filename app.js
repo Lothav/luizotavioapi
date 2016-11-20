@@ -90,7 +90,7 @@ function calcDevilLocation(){
         }
     }
 }
-
+ 
 /*  Postgres DB */
 /*var config = {
  host:'ec2-54-163-239-218.compute-1.amazonaws.com',
