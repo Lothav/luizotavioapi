@@ -18,6 +18,7 @@ var server = express()
 var wss = new WebSocketServer({ server : server });
 var id = 0;
 
+var webSockets = [];
 var players = [];
 var devil = {
     x: 64,
@@ -27,6 +28,7 @@ var devil = {
 wss.on('connection', function(ws) {
     var i, name;
     var player_id = id++;
+    webSockets[player_id]  = ws;
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
         /* First Mensage from player */
@@ -48,23 +50,14 @@ wss.on('connection', function(ws) {
                 }
             calcDevilLocation();
 
-            for( i in wss.clients ) {
-                if( wss.clients.hasOwnProperty(i) ){
-                    wss.clients[i].send(JSON.stringify({ players: players,devil: devil }));
+            for( i in webSockets ) {
+                if( webSockets.hasOwnProperty(i) && i != incommingMsg.id){
+                    webSockets[i].send(JSON.stringify({ players: players,devil: devil }));
                 }
             }
         }
         if(incommingMsg.devil !== undefined)
             devil.y = incommingMsg.devil.y;
-
-        // while( wss.clients.length ){
-        /*for( i in wss.clients ) {
-         if( wss.clients.hasOwnProperty(i) ){
-         wss.clients[i].send(JSON.stringify({ devil: devil }));
-         }
-         }*/
-        //}
-
     });
     ws.on('close', function (close) {
         for(var i = 0; i < players.length; i++){
@@ -88,9 +81,11 @@ wss.on('connection', function(ws) {
 function calcDevilLocation(){
     if(players.length){
         var devil_to = Math.round( Math.random() * (wss.clients.length-1) );
-        if( players[devil_to].x > devil.x ) devil.x++;
-        else devil.x--;
-        devil.follow_id = players[devil_to].id;
+        if( players[devil_to] !== undefined ){
+            if( players[devil_to].x > devil.x ) devil.x++;
+            else devil.x--;
+            devil.follow_id = players[devil_to].id;
+        }
     }
 }
 
