@@ -26,7 +26,7 @@ var devil = {
     follow_id: 0
 };
 wss.on('connection', function(ws) {
-    var i, name;
+    var i, name, player_type;
     var player_id = id++;
     webSockets[player_id]  = ws;
     ws.on('message', function(message) {
@@ -34,11 +34,13 @@ wss.on('connection', function(ws) {
         /* First Mensage from player */
         if( incommingMsg.name !== undefined ){
             name = incommingMsg.name;
+            player_type = incommingMsg.player_type;
             players.push({
                 id: player_id,
                 name: name,
                 x: 800,
                 y: 500,
+                player_type: player_type,
                 fire: false
             });
             ws.send(JSON.stringify({ devil: devil }));
