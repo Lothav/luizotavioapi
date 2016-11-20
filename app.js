@@ -53,8 +53,12 @@ wss.on('connection', function(ws) {
             calcDevilLocation();
 
             for( i in webSockets ) {
-                if( webSockets.hasOwnProperty(i) && i != incommingMsg.id && webSockets[i].readyState == 1){
-                    webSockets[i].send(JSON.stringify({ players: players, devil: devil }));
+                if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
+                    if( i != incommingMsg.id ){
+                        webSockets[i].send(JSON.stringify({ players: players, devil: devil }));
+                    } else {
+                        webSockets[i].send(JSON.stringify({ devil: devil }));
+                    }
                 }
             }
         }
@@ -90,7 +94,7 @@ function calcDevilLocation(){
         }
     }
 }
- 
+
 /*  Postgres DB */
 /*var config = {
  host:'ec2-54-163-239-218.compute-1.amazonaws.com',
