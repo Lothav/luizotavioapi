@@ -57,7 +57,11 @@ wss.on('connection', function(ws) {
                     if( i != incommingMsg.id ){
                         webSockets[i].send(JSON.stringify({ players: players, devil: devil }));
                     } else {
-                        webSockets[i].send(JSON.stringify({ devil: devil }));
+                        var online_players = [];
+                        players.forEach(function (p) {
+                            online_players.push(p.id);
+                        });
+                        webSockets[i].send(JSON.stringify({ devil: devil , online_players: online_players }));
                     }
                 }
             }
@@ -72,6 +76,7 @@ wss.on('connection', function(ws) {
                 break;
             }
         }
+        delete webSockets[player_id];
         console.log('players '+ name +' disconnected: ' + close);
     });
     /*  Fist time connected : Send id to new players
