@@ -38,7 +38,8 @@ wss.on('connection', function(ws) {
                 id: player_id,
                 name: name,
                 x: 800,
-                y: 500
+                y: 500,
+                fire: false
             });
             ws.send(JSON.stringify({ devil: devil }));
         } else {
@@ -46,13 +47,14 @@ wss.on('connection', function(ws) {
                 if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
                     players[i].x = incommingMsg.x;
                     players[i].y = incommingMsg.y;
+                    players[i].fire = incommingMsg.fire;
                     break;
                 }
             calcDevilLocation();
 
             for( i in webSockets ) {
-                if( webSockets.hasOwnProperty(i) && i != incommingMsg.id){
-                    webSockets[i].send(JSON.stringify({ players: players,devil: devil }));
+                if( webSockets.hasOwnProperty(i) && i != incommingMsg.id && webSockets[i].readyState == 1){
+                    webSockets[i].send(JSON.stringify({ players: players, devil: devil }));
                 }
             }
         }
