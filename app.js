@@ -8,14 +8,15 @@ var index = path.join(__dirname, 'index.html');
 
 /*  Express Server  */
 
-var server = express()
-//.use( function(req, res) { res.sendFile( index ) } )
+var app = express();
+app.use( express.static('./') );
+app.use( function(req, res) { res.sendFile( index ) } )
     .listen(port, function(p) { console.log('Listening on ' + p)});
 
 
 /*  Web Socket  */
 
-var wss = new WebSocketServer({ server : server });
+var wss = new WebSocketServer({ server : app });
 var id = 0;
 
 var webSockets = [];

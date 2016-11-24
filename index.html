@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="p2.js"></script>
+    <script src="devil.js"></script>
+</head>
+<body>
+
+<!-- The canvas, where we draw stuff -->
+<canvas width="800" height="600" id="myCanvas"></canvas>
+
+<p>Use arrow keys to control character</p>
+
+
+<script>
+
+    window.onload = function(){
+
+        var devil = new Devil(true);
+
+        window.onkeydown = function (event) {
+            switch (event.keyCode) {
+                case 38: // up
+                case 32: // space
+                    if (!devil.buttons.space) {
+                        if (devil.checkIfCanJump()) devil.characterBody.velocity[1] = devil.jumpSpeed;
+                        devil.buttons.space = true;
+                    }
+                    break;
+                case 39: // right
+                    devil.buttons.right = true;
+                    break;
+                case 37: // left
+                    devil.buttons.left = true;
+                    break;
+            }
+        };
+
+        window.onkeyup = function (event) {
+            switch (event.keyCode) {
+                case 38: // up
+                case 32: // space
+                    devil.buttons.space = false;
+                    break;
+                case 39: // right
+                    devil.buttons.right = false;
+                    break;
+                case 37: // left
+                    devil.buttons.left = false;
+                    break;
+            }
+        };
+    };
+</script>
+
+
+</body>
+</html>
