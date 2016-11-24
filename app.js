@@ -3,15 +3,19 @@ var express = require('express');
 var pg = require('pg'); /* Postgres */
 var path = require("path");
 
-var port = process.env.PORT || 3000;
+var p2 = require('p2');
+
+var port =  3000;
 var index = path.join(__dirname, 'index.html');
+
+var Devil = require('./devil');
 
 /*  Express Server  */
 
-var app = express();
-app.use( express.static('./') );
-app.use( function(req, res) { res.sendFile( index ) } )
-    .listen(port, function(p) { console.log('Listening on ' + p)});
+var app = express()
+//app.use( express.static('./') );
+//app.use( function(req, res) { res.sendFile( index ) } )
+   .listen(port, function(p) { console.log('Listening on ' + p)});
 
 
 /*  Web Socket  */
@@ -55,6 +59,13 @@ wss.on('connection', function(ws) {
                 }
             calcDevilLocation();
 
+
+
+            var devil_obj = new Devil(false);
+
+            if (devil_obj.checkIfCanJump()) devil_obj.characterBody.velocity[1] = devil_obj.jumpSpeed;
+
+
             for( i in webSockets ) {
                 if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
                     if( i != incommingMsg.id ){
@@ -64,7 +75,11 @@ wss.on('connection', function(ws) {
                         players.forEach(function (p) {
                             online_players.push(p.id);
                         });
-                        webSockets[i].send(JSON.stringify({ devil: devil , online_players: online_players }));
+                        console.log( devil_obj.characterBody.position[1]);
+                        webSockets[i].send(JSON.stringify({ devil: {
+                            x : devil_obj.characterBody.position[0],
+                            y : devil_obj.characterBody.position[1]
+                        } , online_players: online_players }));
                     }
                 }
             }

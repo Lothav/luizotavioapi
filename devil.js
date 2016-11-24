@@ -1,4 +1,8 @@
+var p2 = require('p2');
+
 function Devil(render){
+
+    this.devRender = render;
 
     if(render){
         this.canvas = document.getElementById("myCanvas");
@@ -38,7 +42,7 @@ Devil.prototype = {
         // Add a character body
         var characterShape = new p2.Box({width: 58*2, height: 64*2});
         this.characterBody = new p2.Body({
-            position: [200, -200],
+            position: [600, -200],
             mass: 1,
             fixedRotation: true
         });
@@ -62,7 +66,9 @@ Devil.prototype = {
         });
         this.world.addContactMaterial(groundCharacterCM);
 
-        this.animate();
+        if(this.devRender){
+            this.animate();
+        }
     },
     animate: function(t) {
         requestAnimationFrame( this.animate.bind(this) );
@@ -139,3 +145,5 @@ Devil.prototype = {
         return result;
     }
 };
+
+module.exports = Devil;
