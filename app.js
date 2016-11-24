@@ -54,10 +54,7 @@ wss.on('connection', function(ws) {
                 player_type: player_type,
                 fire: false
             });
-            ws.send(JSON.stringify({ devil: {
-                x: devil_obj.characterBody.position[0],
-                y: devil_obj.characterBody.position[0]
-            } }));
+            ws.send(JSON.stringify({ players: players }));
         } else {
             for (i in players)
                 if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
@@ -66,18 +63,17 @@ wss.on('connection', function(ws) {
                     players[i].fire = incommingMsg.fire;
                     break;
                 }
-            calcDevilLocation();
 
             for( i in webSockets ) {
                 if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
                     if( i != incommingMsg.id ){
-                        webSockets[i].send(JSON.stringify({ players: players, devil: devil }));
+                        webSockets[i].send(JSON.stringify({ players: players }));
                     } else {
                         var online_players = [];
                         players.forEach(function (p) {
                             online_players.push(p.id);
                         });
-                        webSockets[i].send(JSON.stringify({ online_players: online_players }));
+                        //webSockets[i].send(JSON.stringify({ online_players: online_players }));
                     }
                 }
             }
@@ -103,7 +99,7 @@ wss.on('connection', function(ws) {
     }
 });
 
-function calcDevilLocation(){
+/*function calcDevilLocation(){
     if(players.length){
         var devil_to = Math.round( Math.random() * (wss.clients.length-1) );
         if( players[devil_to] !== undefined ){
@@ -112,7 +108,7 @@ function calcDevilLocation(){
             devil.follow_id = players[devil_to].id;
         }
     }
-}
+}*/
 
 /*  Postgres DB */
 /*var config = {

@@ -27,7 +27,7 @@ function Devil(render, player, webScokets){
     this.timeStep = 1 / 60;
     this.maxSubSteps = 10;
 
-
+    this.devil_slimes = [];
 
     this.init();
 }
@@ -86,7 +86,7 @@ Devil.prototype = {
         if (this.buttons.right) this.characterBody.velocity[0] = this.walkSpeed;
         else if (this.buttons.left) this.characterBody.velocity[0] = -this.walkSpeed;
         else this.characterBody.velocity[0] = 0;
-        if (this.checkIfCanJump()) this.characterBody.velocity[1] = this.jumpSpeed;
+       // if (this.checkIfCanJump()) this.characterBody.velocity[1] = this.jumpSpeed;
 
 
         if(this.characterBody.position[0] > 1560) change_d = -1;
@@ -94,10 +94,8 @@ Devil.prototype = {
 
         if(change_d > 0){
             this.characterBody.velocity[0] = this.walkSpeed;
-
-        }else{
+        } else {
             this.characterBody.velocity[0] = -this.walkSpeed;
-
         }
 
         // Move physics bodies forward in time
@@ -108,18 +106,17 @@ Devil.prototype = {
 
         this.lastTime = t / 1000;
         if(!this.devRender) {
-            setTimeout(function(){
-                for(var i in this._webSockets){
-                    if(this._webSockets[i].readyState == 1){
-
-                        this._webSockets[i].send(JSON.stringify({ devil: {
-                            x : this.characterBody.position[0],
-                            y : -this.characterBody.position[1]
-                        }}));
-                    }
+            for(var i in this._webSockets){
+                if(this._webSockets[i].readyState == 1){
+                    this._webSockets[i].send(JSON.stringify({ devil: {
+                        x : this.characterBody.position[0],
+                        y : -this.characterBody.position[1]
+                    }}));
                 }
+            }
+            setTimeout(function(){
                 this.animate(new Date());
-            }.bind(this),100);
+            }.bind(this),50);
         }else{
             this.render.update(this.characterBody, this.planeBody);
             this.render.render();
@@ -143,6 +140,6 @@ Devil.prototype = {
         this._webSockets = webSockets;
     }
 };
-if(module !== undefined){
-    module.exports = Devil;
+if(module !== undefined) {
+    module.exports = Devil; // not work in dev mode
 }
