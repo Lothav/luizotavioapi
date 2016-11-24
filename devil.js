@@ -1,4 +1,5 @@
 
+var change_d = 1;
 function Devil(render, player, webScokets){
 
     this.devRender = render;
@@ -88,7 +89,16 @@ Devil.prototype = {
         if (this.checkIfCanJump()) this.characterBody.velocity[1] = this.jumpSpeed;
 
 
+        if(this.characterBody.position[0] > 1560) change_d = -1;
+        if(this.characterBody.position[0] < 40) change_d = 1;
 
+        if(change_d > 0){
+            this.characterBody.velocity[0] = this.walkSpeed;
+
+        }else{
+            this.characterBody.velocity[0] = -this.walkSpeed;
+
+        }
 
         // Move physics bodies forward in time
         this.world.step(this.timeStep, dt, this.maxSubSteps);
@@ -100,10 +110,13 @@ Devil.prototype = {
         if(!this.devRender) {
             setTimeout(function(){
                 for(var i in this._webSockets){
-                    this._webSockets[i].send(JSON.stringify({ devil: {
-                        x : this.characterBody.position[0],
-                        y : -this.characterBody.position[1]
-                    }}));
+                    if(this._webSockets[i].readyState == 1){
+
+                        this._webSockets[i].send(JSON.stringify({ devil: {
+                            x : this.characterBody.position[0],
+                            y : -this.characterBody.position[1]
+                        }}));
+                    }
                 }
                 this.animate(new Date());
             }.bind(this),100);
