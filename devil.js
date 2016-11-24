@@ -1,14 +1,15 @@
-var p2 = require('p2');
 
-function Devil(render, player){
+function Devil(render, player, webScokets){
 
     this.devRender = render;
 
-    if(render){
-        var Render = require('./render');
-        this.render = new Render();
+    if( !render ){
+        p2 = require('p2');
+    } else {
+        this.render = new Render(this.characterBody, this.planeBody);
     }
 
+    this._webSockets = webScokets;
     this.world = new p2.World();
     this.characterBody = null;
     this.planeBody = null;
@@ -24,6 +25,8 @@ function Devil(render, player){
     this.walkSpeed = 160;
     this.timeStep = 1 / 60;
     this.maxSubSteps = 10;
+
+
 
     this.init();
 }
@@ -70,8 +73,9 @@ Devil.prototype = {
 
     },
     animate: function(t) {
-        requestAnimationFrame( this.animate.bind(this) );
-
+        if(this.devRender) {
+            requestAnimationFrame(this.animate.bind(this));
+        }
         var dt = t !== undefined && this.lastTime !== undefined ? t / 1000 - this.lastTime : 0;
 
 
@@ -81,6 +85,7 @@ Devil.prototype = {
         if (this.buttons.right) this.characterBody.velocity[0] = this.walkSpeed;
         else if (this.buttons.left) this.characterBody.velocity[0] = -this.walkSpeed;
         else this.characterBody.velocity[0] = 0;
+        if (this.checkIfCanJump()) this.characterBody.velocity[1] = this.jumpSpeed;
 
 
 
@@ -89,12 +94,42 @@ Devil.prototype = {
         this.world.step(this.timeStep, dt, this.maxSubSteps);
 
         // Render scene
-        if(this.devRender) {
-            this.render();
-        }
+
+
         this.lastTime = t / 1000;
+        if(!this.devRender) {
+            setTimeout(function(){
+                for(var i in this._webSockets){
+                    this._webSockets[i].send(JSON.stringify({ devil: {
+                        x : this.characterBody.position[0],
+                        y : -this.characterBody.position[1]
+                    }}));
+                }
+                this.animate(new Date());
+            }.bind(this),100);
+        }else{
+            this.render.update(this.characterBody, this.planeBody);
+            this.render.render();
+        }
+    },
+
+    checkIfCanJump: function() {
+        var yAxis = p2.vec2.fromValues(0, 1);
+        var result = false;
+        for (var i = 0; i < this.world.narrowphase.contactEquations.length; i++) {
+            var c = this.world.narrowphase.contactEquations[i];
+            if (c.bodyA === this.characterBody || c.bodyB === this.characterBody) {
+                var d = p2.vec2.dot(c.normalA, yAxis); // Normal dot Y-axis
+                if (c.bodyA === this.characterBody) d *= -1;
+                if (d > 0.5) result = true;
+            }
+        }
+        return result;
+    },
+    updateSockets : function(webSockets){
+        this._webSockets = webSockets;
     }
-
 };
-
-module.exports = Devil;
+if(module !== undefined){
+    module.exports = Devil;
+}

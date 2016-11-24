@@ -12,15 +12,15 @@ var Devil = require('./devil');
 
 /*  Express Server  */
 
-var app = express()
-//app.use( express.static('./') );
-//app.use( function(req, res) { res.sendFile( index ) } )
-   .listen(port, function(p) { console.log('Listening on ' + p)});
+var app = express();
+app.use( express.static('./') );
+app.use( function(req, res) { res.sendFile( index ) } );
+var server = app.listen(port, function(p) { console.log('Listening on ' + p)});
 
 
 /*  Web Socket  */
 
-var wss = new WebSocketServer({ server : app });
+var wss = new WebSocketServer({ server : server });
 var id = 0;
 
 var webSockets = [];
@@ -30,10 +30,16 @@ var devil = {
     y: 80,
     follow_id: 0
 };
+
+var devil_obj = new Devil(false, players[0], webSockets);
+
 wss.on('connection', function(ws) {
     var i, name, player_type;
     var player_id = id++;
     webSockets[player_id]  = ws;
+
+    devil_obj.updateSockets(webSockets);
+
     ws.on('message', function(message) {
         var incommingMsg = JSON.parse(message);
         /* First Mensage from player */
@@ -59,13 +65,6 @@ wss.on('connection', function(ws) {
                 }
             calcDevilLocation();
 
-
-
-            var devil_obj = new Devil(false);
-
-            if (devil_obj.checkIfCanJump()) devil_obj.characterBody.velocity[1] = devil_obj.jumpSpeed;
-
-
             for( i in webSockets ) {
                 if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
                     if( i != incommingMsg.id ){
@@ -75,17 +74,11 @@ wss.on('connection', function(ws) {
                         players.forEach(function (p) {
                             online_players.push(p.id);
                         });
-                        console.log( devil_obj.characterBody.position[1]);
-                        webSockets[i].send(JSON.stringify({ devil: {
-                            x : devil_obj.characterBody.position[0],
-                            y : devil_obj.characterBody.position[1]
-                        } , online_players: online_players }));
+                        webSockets[i].send(JSON.stringify({ online_players: online_players }));
                     }
                 }
             }
         }
-        if(incommingMsg.devil !== undefined)
-            devil.y = incommingMsg.devil.y;
     });
     ws.on('close', function (close) {
         for(var i = 0; i < players.length; i++){

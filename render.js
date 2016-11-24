@@ -1,8 +1,11 @@
-function Render(){
+function Render(characterBody, planeBody){
     this.canvas = document.getElementById("myCanvas");
     this.w = this.canvas.width;
     this.h = this.canvas.height;
     this.ctx = this.canvas.getContext("2d");
+
+    this.characterBody = characterBody;
+    this.planeBody = planeBody;
 }
 
 Render.prototype = {
@@ -48,20 +51,11 @@ Render.prototype = {
             x0 = this.planeBody.position[0];
         this.ctx.fillRect(x0, y0, this.w, -64);
     },
-
-    checkIfCanJump: function() {
-        var yAxis = p2.vec2.fromValues(0, 1);
-        var result = false;
-        for (var i = 0; i < this.world.narrowphase.contactEquations.length; i++) {
-            var c = this.world.narrowphase.contactEquations[i];
-            if (c.bodyA === this.characterBody || c.bodyB === this.characterBody) {
-                var d = p2.vec2.dot(c.normalA, yAxis); // Normal dot Y-axis
-                if (c.bodyA === this.characterBody) d *= -1;
-                if (d > 0.5) result = true;
-            }
-        }
-        return result;
+    update : function(characterBody, planeBody){
+        this.planeBody = planeBody;
+        this.characterBody = characterBody;
     }
 };
-
-module.exports = Render;
+if(module !== undefined){
+    module.exports = Render;
+}
