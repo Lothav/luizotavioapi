@@ -5,7 +5,7 @@ var path = require("path");
 
 var p2 = require('p2');
 
-var port =  3000;
+var port =  process.env.PORT || 3000;
 var index = path.join(__dirname, 'index.html');
 
 var Devil = require('./devil');
