@@ -54,7 +54,10 @@ wss.on('connection', function(ws) {
                 player_type: player_type,
                 fire: false
             });
-            ws.send(JSON.stringify({ devil: devil }));
+            ws.send(JSON.stringify({ devil: {
+                x: devil_obj.characterBody.position[0],
+                y: devil_obj.characterBody.position[0]
+            } }));
         } else {
             for (i in players)
                 if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
