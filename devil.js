@@ -100,9 +100,12 @@ Devil.prototype = {
 
             var devilSlimeMaterial = new p2.Material();
 
-            var devilSlimeShape = new p2.Box({width: 28, height: 28 });
+            var devilSlimeShape = new p2.Box({width: 2*28, height: 28 });
             var devilSlimeBody = new p2.Body({
-                position: [this.characterBody.position[0]- Math.round(Math.random()*50), this.characterBody.position[1]],
+                position: [
+                    this.characterBody.position[0] - Math.round(Math.random()*50 - 30 ),
+                    this.characterBody.position[1]
+                ],
                 mass: 1,
                 fixedRotation: true
             });
@@ -113,7 +116,6 @@ Devil.prototype = {
             devilSlimeBody.damping = 0.5;
             devilSlimeBody.gravityScale = 350;
 
-
             var groundSlimeCM = new p2.ContactMaterial(this.groundMaterial, devilSlimeMaterial, {
                 friction: 0.0
             });
@@ -122,7 +124,11 @@ Devil.prototype = {
             this.devil_slimes.push({
                 id: this.id_count++,
                 devilSlimeBody: devilSlimeBody
-            })
+            });
+            if(this.devil_slimes.length > 3){
+                this.world.removeBody( this.devil_slimes[0].devilSlimeBody );
+                this.devil_slimes.shift();
+            }
         }
         count++;
         // Move physics bodies forward in time
@@ -134,13 +140,22 @@ Devil.prototype = {
         if(!this.devRender) {
             for(var i in this._webSockets){
                 if(this._webSockets[i].readyState == 1){
-                    this._webSockets[i].send(JSON.stringify(
-                        {
+
+                    var slimes = [];
+                    this.devil_slimes.forEach(function(ds){
+                        slimes.push({
+                            id: ds.id,
+                            x: ds.devilSlimeBody.position[0],
+                            y: -ds.devilSlimeBody.position[1]
+                        });
+                    });
+
+                    this._webSockets[i].send(JSON.stringify({
                             devil: {
                                 x : this.characterBody.position[0],
                                 y : -this.characterBody.position[1]
                             },
-                            devil_slimes:[]
+                            devil_slimes: slimes
                         }
                     ));
                 }
