@@ -1,11 +1,14 @@
-function Render(characterBody, planeBody){
+function Render(devil_slimes, characterBody, planeBody, devilSlimeBody){
     this.canvas = document.getElementById("myCanvas");
     this.w = this.canvas.width;
     this.h = this.canvas.height;
     this.ctx = this.canvas.getContext("2d");
 
+    this.devil_slimes = devil_slimes;
+
     this.characterBody = characterBody;
     this.planeBody = planeBody;
+    this.devilSlimeBody = devilSlimeBody;
 }
 
 Render.prototype = {
@@ -30,6 +33,11 @@ Render.prototype = {
         this.ctx.fillStyle = 'red';
         this.drawBox.call(this, this.characterBody);
 
+        this.ctx.fillStyle = 'blue';
+        this.devil_slimes.forEach(function(ds){
+            this.drawBox.call(this, ds.devilSlimeBody);
+        }.bind(this));
+
         // Restore transform
         this.ctx.restore();
     },
@@ -51,9 +59,11 @@ Render.prototype = {
             x0 = this.planeBody.position[0];
         this.ctx.fillRect(x0, y0, this.w, -64);
     },
-    update : function(characterBody, planeBody){
+    update : function(devil_slimes, characterBody, planeBody, devilSlimeBody){
         this.planeBody = planeBody;
         this.characterBody = characterBody;
+        this.devilSlimeBody = devilSlimeBody;
+        this.devil_slimes = devil_slimes;
     }
 };
 if(module !== undefined){
