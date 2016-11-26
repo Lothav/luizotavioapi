@@ -54,7 +54,7 @@ wss.on('connection', function(ws) {
                 player_type: player_type,
                 fire: false
             });
-            ws.send(JSON.stringify({ players: players }));
+            ws.send(JSON.stringify({ id: player_id, players: players }));
         } else {
             for (i in players)
                 if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
@@ -63,7 +63,7 @@ wss.on('connection', function(ws) {
                     players[i].fire = incommingMsg.fire;
                     break;
                 }
-
+            devil_obj.updatePlayers(players[0]);
             for( i in webSockets ) {
                 if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
                     if( i != incommingMsg.id ){

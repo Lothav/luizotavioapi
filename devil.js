@@ -1,6 +1,6 @@
 
 var change_d = 1;
-function Devil(render, player, webScokets){
+function Devil(render, player, webSockets){
 
     this.devRender = render;
 
@@ -10,7 +10,7 @@ function Devil(render, player, webScokets){
         this.render = new Render(this.devil_slimes, this.characterBody, this.planeBody, this.devilSlimeBody);
     }
 
-    this._webSockets = webScokets;
+    this._webSockets = webSockets;
     this.world = new p2.World();
     this.characterBody = null;
     this.devilSlimeBody = null;
@@ -85,7 +85,7 @@ Devil.prototype = {
         if (this.buttons.right) this.characterBody.velocity[0] = this.walkSpeed;
         else if (this.buttons.left) this.characterBody.velocity[0] = -this.walkSpeed;
         else this.characterBody.velocity[0] = 0;
-        if (this.checkIfCanJump()) this.characterBody.velocity[1] = this.jumpSpeed;
+        if (this.checkIfCanJump(this.characterBody)) this.characterBody.velocity[1] = this.jumpSpeed;
 
         if(this.characterBody.position[0] > 1560) change_d = -1;
         if(this.characterBody.position[0] < 40) change_d = 1;
@@ -131,11 +131,26 @@ Devil.prototype = {
             }
         }
         count++;
+
+        this.devil_slimes.forEach(function (ds) {
+            if(this.player !== undefined){
+                if( ds.devilSlimeBody.position[0] < this.player.x ){
+                    ds.devilSlimeBody.velocity[0] = this.walkSpeed;
+                } else {
+                    ds.devilSlimeBody.velocity[0] = -this.walkSpeed;
+                }
+                if(-(ds.devilSlimeBody.position[1] + 100) > this.player.y){
+                    if (this.checkIfCanJump(ds.devilSlimeBody)) ds.devilSlimeBody.velocity[1] = 500;
+                }
+            }
+
+//            ds.devilSlimeBody.position[1];
+        }.bind(this));
+
         // Move physics bodies forward in time
         this.world.step(this.timeStep, dt, this.maxSubSteps);
 
         // Render scene
-
         this.lastTime = t / 1000;
         if(!this.devRender) {
             for(var i in this._webSockets){
@@ -169,14 +184,14 @@ Devil.prototype = {
         }
     },
 
-    checkIfCanJump: function() {
+    checkIfCanJump: function(body) {
         var yAxis = p2.vec2.fromValues(0, 1);
         var result = false;
         for (var i = 0; i < this.world.narrowphase.contactEquations.length; i++) {
             var c = this.world.narrowphase.contactEquations[i];
-            if (c.bodyA === this.characterBody || c.bodyB === this.characterBody) {
+            if (c.bodyA === body || c.bodyB === body) {
                 var d = p2.vec2.dot(c.normalA, yAxis); // Normal dot Y-axis
-                if (c.bodyA === this.characterBody) d *= -1;
+                if (c.bodyA === body) d *= -1;
                 if (d > 0.5) result = true;
             }
         }
@@ -185,6 +200,10 @@ Devil.prototype = {
 
     updateSockets: function(webSockets){
         this._webSockets = webSockets;
+    },
+
+    updatePlayers: function (player) {
+        this.player = player;
     }
 };
 if( undefined !== module ) {
