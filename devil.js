@@ -219,14 +219,16 @@ Devil.prototype = {
             });
             this.world.addContactMaterial(groundSlimeCM);
 
-            this.devil_slimes.push({
-                id: this.id_count++,
-                devilSlimeBody: devilSlimeBody
-            });
             if(this.devil_slimes.length > 3){
                 this.world.removeBody( this.devil_slimes[0].devilSlimeBody );
                 this.devil_slimes.shift();
             }
+
+            this.devil_slimes.push({
+                // @TODO fix this if necessary implement slime id
+             //   id: this.devil_slimes.length,
+                devilSlimeBody: devilSlimeBody
+            });
             count = 0;
         }
         count++;
