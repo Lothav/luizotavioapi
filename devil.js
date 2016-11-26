@@ -90,7 +90,7 @@ Devil.prototype = {
             height : 73,
             width: 252
         },{
-            position : [1210, -835],
+            position : [1235, -835],
             height : 73,
             width: 380
         },{
@@ -226,7 +226,7 @@ Devil.prototype = {
 
             this.devil_slimes.push({
                 // @TODO fix this if necessary implement slime id
-             //   id: this.devil_slimes.length,
+                id: this.id_count++,
                 devilSlimeBody: devilSlimeBody
             });
             count = 0;
@@ -236,6 +236,7 @@ Devil.prototype = {
 
             if (this.checkIfCanJump(this.characterBody)) this.characterBody.velocity[1] = this.jumpSpeed;
         }
+        //if (this.checkIfCanJump(this.characterBody) && this.buttons.space ) this.characterBody.velocity[1] = this.jumpSpeed;
 
         if(count % 15 == 0) {
 
