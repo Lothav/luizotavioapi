@@ -82,11 +82,11 @@ Devil.prototype = {
             height : 73,
             width: 252
         },{
-            position : [800, -565],
+            position : [800, -585],
             height : 73,
             width: 252
         },{
-            position : [950, -455],
+            position : [950, -475],
             height : 73,
             width: 252
         },{
@@ -94,11 +94,11 @@ Devil.prototype = {
             height : 73,
             width: 380
         },{
-            position : [1470, -460],
+            position : [1500, -485],
             height : 73,
             width: 174
         },{
-            position : [1270, -330],
+            position : [1280, -340],
             height : 73,
             width: 174
         },{
@@ -197,7 +197,7 @@ Devil.prototype = {
 
         if(count % 30 == 0) {
 
-            /*var devilSlimeMaterial = new p2.Material();
+            var devilSlimeMaterial = new p2.Material();
 
             var devilSlimeShape = new p2.Box({width: 2*28, height: 28 });
             var devilSlimeBody = new p2.Body({
@@ -220,10 +220,10 @@ Devil.prototype = {
             });
             this.world.addContactMaterial(groundSlimeCM);
 
-            /*this.devil_slimes.push({
+            this.devil_slimes.push({
                 id: this.id_count++,
                 devilSlimeBody: devilSlimeBody
-            });*/
+            });
             if(this.devil_slimes.length > 3){
                 this.world.removeBody( this.devil_slimes[0].devilSlimeBody );
                 this.devil_slimes.shift();
