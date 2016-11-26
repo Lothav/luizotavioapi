@@ -1,10 +1,11 @@
-function Render(devil_slimes, characterBody, planeBody, devilSlimeBody){
+function Render(devil_slimes, characterBody, planeBody, devilSlimeBody, platforms){
     this.canvas = document.getElementById("myCanvas");
     this.w = this.canvas.width;
     this.h = this.canvas.height;
     this.ctx = this.canvas.getContext("2d");
 
     this.devil_slimes = devil_slimes;
+    this.platforms = platforms;
 
     this.characterBody = characterBody;
     this.planeBody = planeBody;
@@ -38,6 +39,8 @@ Render.prototype = {
             this.drawBox.call(this, ds.devilSlimeBody);
         }.bind(this));
 
+        this.drawPlatforms.call(this);
+
         // Restore transform
         this.ctx.restore();
     },
@@ -59,11 +62,23 @@ Render.prototype = {
             x0 = this.planeBody.position[0];
         this.ctx.fillRect(x0, y0, this.w, -64);
     },
-    update : function(devil_slimes, characterBody, planeBody, devilSlimeBody){
+    drawPlatforms: function() {
+        for(var plat in this.platforms){
+            if(this.platforms.hasOwnProperty(plat)){
+                var y0 = this.platforms[plat].body.position[1],
+                    x0 = this.platforms[plat].body.position[0],
+                    width = this.platforms[plat].width,
+                    height = this.platforms[plat].height;
+                this.ctx.fillRect(x0 - (width/2), y0 + (height/2), width, -height);
+            }
+        }
+    },
+    update : function(devil_slimes, characterBody, planeBody, devilSlimeBody, platforms){
         this.planeBody = planeBody;
         this.characterBody = characterBody;
         this.devilSlimeBody = devilSlimeBody;
         this.devil_slimes = devil_slimes;
+        this.platforms = platforms;
     }
 };
 if(module !== undefined){

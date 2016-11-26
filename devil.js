@@ -7,7 +7,7 @@ function Devil(render, player, webSockets){
     if( !render ){
         p2 = require('p2');
     } else {
-        this.render = new Render(this.devil_slimes, this.characterBody, this.planeBody, this.devilSlimeBody);
+        this.render = new Render(this.devil_slimes, this.characterBody, this.planeBody, this.devilSlimeBody, this.platforms);
     }
 
     this._webSockets = webSockets;
@@ -24,12 +24,13 @@ function Devil(render, player, webSockets){
     this.player = player;
 
     this.id_count = 0;
-    this.jumpSpeed = 1500;
+    this.jumpSpeed = 1300;
     this.walkSpeed = 160;
     this.timeStep = 1 / 60;
     this.maxSubSteps = 10;
 
     this.devil_slimes = [];
+    this.platforms = [];
 
     this.init();
 }
@@ -60,7 +61,7 @@ Devil.prototype = {
 
         var planeShape = new p2.Plane();
         this.planeBody = new p2.Body({
-            position: [0, -536]
+            position: [0, -736]
         });
         this.planeBody.addShape(planeShape);
         this.world.addBody(this.planeBody);
@@ -69,7 +70,105 @@ Devil.prototype = {
         var groundCharacterCM = new p2.ContactMaterial(this.groundMaterial, characterMaterial, {
             friction: 0.0
         });
+
+
+
+        var platformPositions = [{
+            position : [300, -630],
+            height : 73,
+            width: 320
+        },{
+            position : [320, -500],
+            height : 73,
+            width: 252
+        },{
+            position : [800, -565],
+            height : 73,
+            width: 252
+        },{
+            position : [950, -455],
+            height : 73,
+            width: 252
+        },{
+            position : [1210, -635],
+            height : 73,
+            width: 380
+        },{
+            position : [1470, -460],
+            height : 73,
+            width: 174
+        },{
+            position : [1270, -330],
+            height : 73,
+            width: 174
+        },{
+            position : [560, -350],
+            height : 73,
+            width: 174
+        }];
+
+
+        for(var i = 0; i < platformPositions.length; i++){
+            var platformBody = new p2.Body({
+                mass: 0, // Static
+                position: platformPositions[i].position
+
+            });
+            platformBody.type = p2.Body.KINEMATIC;
+            var platformShape = new p2.Box({ width: platformPositions[i].width, height: platformPositions[i].height });
+            platformShape.material = this.groundMaterial;
+            platformBody.addShape(platformShape);
+            this.world.addBody(platformBody);
+            this.platforms.push({
+                body: platformBody,
+                height : platformPositions[i].height,
+                width : platformPositions[i].width
+            });
+        }
+
         this.world.addContactMaterial(groundCharacterCM);
+
+
+
+
+        // Allow pass through platforms from below
+        var passThroughBody;
+
+        this.world.on('beginContact', function (evt){
+            if(evt.bodyA !== this.characterBody && evt.bodyB !== this.characterBody) return;
+            var otherBody = evt.bodyA === this.characterBody ? evt.bodyB : evt.bodyA;
+            for(var p in this.platforms){
+                if(p.body == otherBody){
+                    return;
+                }
+            }
+            if(otherBody.position[1] > this.characterBody.position[1]){
+                passThroughBody = otherBody;
+            }
+        }.bind(this));
+
+        // Disable any equations between the current passthrough body and the character
+        var eq;
+        this.world.on('preSolve', function (evt){
+            for( i = 0; i < evt.contactEquations.length; i++){
+                eq = evt.contactEquations[i];
+                if((eq.bodyA === this.characterBody && eq.bodyB === passThroughBody) || eq.bodyB === this.characterBody && eq.bodyA === passThroughBody){
+                    eq.enabled = false;
+                }
+            }
+            for(i = 0; i < evt.frictionEquations.length; i++){
+                eq = evt.frictionEquations[i];
+                if((eq.bodyA === this.characterBody && eq.bodyB === passThroughBody) || eq.bodyB === this.characterBody && eq.bodyA === passThroughBody){
+                    eq.enabled = false;
+                }
+            }
+        }.bind(this));
+
+        this.world.on('endContact', function (evt){
+            if((evt.bodyA === this.characterBody && evt.bodyB === passThroughBody) || evt.bodyB === this.characterBody && evt.bodyA === passThroughBody){
+                passThroughBody = undefined;
+            }
+        }.bind(this));
 
         this.animate();
 
@@ -85,7 +184,7 @@ Devil.prototype = {
         if (this.buttons.right) this.characterBody.velocity[0] = this.walkSpeed;
         else if (this.buttons.left) this.characterBody.velocity[0] = -this.walkSpeed;
         else this.characterBody.velocity[0] = 0;
-        if (this.checkIfCanJump(this.characterBody)) this.characterBody.velocity[1] = this.jumpSpeed;
+        if (this.checkIfCanJump(this.characterBody) ) this.characterBody.velocity[1] = this.jumpSpeed;
 
         if(this.characterBody.position[0] > 1560) change_d = -1;
         if(this.characterBody.position[0] < 40) change_d = 1;
@@ -96,9 +195,9 @@ Devil.prototype = {
             this.characterBody.velocity[0] = -this.walkSpeed;
         }
 
-        if(count % 30 == 0){
+        if(count % 30 == 0) {
 
-            var devilSlimeMaterial = new p2.Material();
+            /*var devilSlimeMaterial = new p2.Material();
 
             var devilSlimeShape = new p2.Box({width: 2*28, height: 28 });
             var devilSlimeBody = new p2.Body({
@@ -121,10 +220,10 @@ Devil.prototype = {
             });
             this.world.addContactMaterial(groundSlimeCM);
 
-            this.devil_slimes.push({
+            /*this.devil_slimes.push({
                 id: this.id_count++,
                 devilSlimeBody: devilSlimeBody
-            });
+            });*/
             if(this.devil_slimes.length > 3){
                 this.world.removeBody( this.devil_slimes[0].devilSlimeBody );
                 this.devil_slimes.shift();
@@ -143,8 +242,6 @@ Devil.prototype = {
                     if (this.checkIfCanJump(ds.devilSlimeBody)) ds.devilSlimeBody.velocity[1] = 500;
                 }
             }
-
-//            ds.devilSlimeBody.position[1];
         }.bind(this));
 
         // Move physics bodies forward in time
@@ -155,7 +252,6 @@ Devil.prototype = {
         if(!this.devRender) {
             for(var i in this._webSockets){
                 if(this._webSockets[i].readyState == 1){
-
                     var slimes = [];
                     this.devil_slimes.forEach(function(ds){
                         slimes.push({
@@ -164,7 +260,6 @@ Devil.prototype = {
                             y: -ds.devilSlimeBody.position[1]
                         });
                     });
-
                     this._webSockets[i].send(JSON.stringify({
                             devil: {
                                 x : this.characterBody.position[0],
@@ -179,7 +274,7 @@ Devil.prototype = {
                 this.animate(new Date());
             }.bind(this), 50);
         } else {
-            this.render.update(this.devil_slimes, this.characterBody, this.planeBody, this.devilSlimeBody);
+            this.render.update(this.devil_slimes, this.characterBody, this.planeBody, this.devilSlimeBody, this.platforms);
             this.render.render();
         }
     },
