@@ -49,7 +49,7 @@ Devil.prototype = {
         // Add a character body
         var characterShape = new p2.Box({ width: 58*2, height:  64*2});
         this.characterBody = new p2.Body({
-            position: [600, -200],
+            position: [600, -400],
             mass: 1,
             fixedRotation: true
         });
@@ -61,7 +61,7 @@ Devil.prototype = {
 
         var planeShape = new p2.Plane();
         this.planeBody = new p2.Body({
-            position: [0, -736]
+            position: [0, -936]
         });
         this.planeBody.addShape(planeShape);
         this.world.addBody(this.planeBody);
@@ -74,35 +74,35 @@ Devil.prototype = {
 
 
         var platformPositions = [{
-            position : [300, -630],
+            position : [300, -830],
             height : 73,
             width: 320
         },{
-            position : [320, -500],
+            position : [320, -700],
             height : 73,
             width: 252
         },{
-            position : [800, -585],
+            position : [800, -785],
             height : 73,
             width: 252
         },{
-            position : [950, -475],
+            position : [950, -675],
             height : 73,
             width: 252
         },{
-            position : [1210, -635],
+            position : [1210, -835],
             height : 73,
             width: 380
         },{
-            position : [1500, -485],
+            position : [1500, -685],
             height : 73,
             width: 174
         },{
-            position : [1280, -340],
+            position : [1280, -540],
             height : 73,
             width: 174
         },{
-            position : [560, -350],
+            position : [560, -550],
             height : 73,
             width: 174
         }];
@@ -184,7 +184,6 @@ Devil.prototype = {
         if (this.buttons.right) this.characterBody.velocity[0] = this.walkSpeed;
         else if (this.buttons.left) this.characterBody.velocity[0] = -this.walkSpeed;
         else this.characterBody.velocity[0] = 0;
-        if (this.checkIfCanJump(this.characterBody) ) this.characterBody.velocity[1] = this.jumpSpeed;
 
         if(this.characterBody.position[0] > 1560) change_d = -1;
         if(this.characterBody.position[0] < 40) change_d = 1;
@@ -228,22 +227,29 @@ Devil.prototype = {
                 this.world.removeBody( this.devil_slimes[0].devilSlimeBody );
                 this.devil_slimes.shift();
             }
+            count = 0;
         }
         count++;
+        if(count % Math.round(Math.random()*20) == 0) {
 
-        this.devil_slimes.forEach(function (ds) {
-            if(this.player !== undefined){
-                if( ds.devilSlimeBody.position[0] < this.player.x ){
-                    ds.devilSlimeBody.velocity[0] = this.walkSpeed;
-                } else {
-                    ds.devilSlimeBody.velocity[0] = -this.walkSpeed;
-                }
-                if(-(ds.devilSlimeBody.position[1] + 100) > this.player.y){
-                    if (this.checkIfCanJump(ds.devilSlimeBody)) ds.devilSlimeBody.velocity[1] = 500;
-                }
-            }
-        }.bind(this));
+            if (this.checkIfCanJump(this.characterBody)) this.characterBody.velocity[1] = this.jumpSpeed;
+        }
 
+        if(count % 15 == 0) {
+
+            this.devil_slimes.forEach(function (ds) {
+                if (this.player !== undefined) {
+                    if (ds.devilSlimeBody.position[0] < this.player.x) {
+                        ds.devilSlimeBody.velocity[0] = this.walkSpeed;
+                    } else {
+                        ds.devilSlimeBody.velocity[0] = -this.walkSpeed;
+                    }
+                    if (-(ds.devilSlimeBody.position[1] + 100) > this.player.y) {
+                        if (this.checkIfCanJump(ds.devilSlimeBody)) ds.devilSlimeBody.velocity[1] = 500;
+                    }
+                }
+            }.bind(this));
+        }
         // Move physics bodies forward in time
         this.world.step(this.timeStep, dt, this.maxSubSteps);
 
