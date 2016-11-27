@@ -73,7 +73,7 @@ wss.on('connection', function(ws) {
                         players.forEach(function (p) {
                             online_players.push(p.id);
                         });
-                        //webSockets[i].send(JSON.stringify({ online_players: online_players }));
+                        webSockets[i].send(JSON.stringify({ online_players: online_players }));
                     }
                 }
             }
