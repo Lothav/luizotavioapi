@@ -70,8 +70,7 @@ Devil.prototype = {
         var groundCharacterCM = new p2.ContactMaterial(this.groundMaterial, characterMaterial, {
             friction: 0.0
         });
-
-
+        this.world.addContactMaterial(groundCharacterCM);
 
         var platformPositions = [{
             position : [300, -830],
@@ -107,7 +106,6 @@ Devil.prototype = {
             width: 174
         }];
 
-
         for(var i = 0; i < platformPositions.length; i++){
             var platformBody = new p2.Body({
                 mass: 0, // Static
@@ -125,10 +123,6 @@ Devil.prototype = {
                 width : platformPositions[i].width
             });
         }
-
-        this.world.addContactMaterial(groundCharacterCM);
-
-
 
 
         // Allow pass through platforms from below
@@ -151,7 +145,21 @@ Devil.prototype = {
         var eq;
         this.world.on('preSolve', function (evt){
             for( i = 0; i < evt.contactEquations.length; i++){
+
                 eq = evt.contactEquations[i];
+                var slime_contact = 0;
+                for(var j in this.devil_slimes){
+                    for(var k in this.devil_slimes){
+                        if( eq.bodyA === this.devil_slimes[j].devilSlimeBody &&
+                            eq.bodyB === this.devil_slimes[k].devilSlimeBody) {
+                            slime_contact++;
+                        }
+                    }
+                }
+                if(slime_contact){
+                    eq.enabled = false;
+                }
+
                 if((eq.bodyA === this.characterBody && eq.bodyB === passThroughBody) || eq.bodyB === this.characterBody && eq.bodyA === passThroughBody){
                     eq.enabled = false;
                 }
@@ -308,6 +316,17 @@ Devil.prototype = {
 
     updatePlayers: function (player) {
         this.player = player;
+    },
+    removeSlimeById: function (ids){
+        for(var t in ids){
+            for(var j in this.devil_slimes){
+                if( this.devil_slimes[j].id == ids[t] ){
+                    this.world.removeBody( this.devil_slimes[j].devilSlimeBody );
+                    this.devil_slimes.splice(this.devil_slimes.indexOf(this.devil_slimes[j].id), 1);
+                }
+            }
+        }
+
     }
 };
 if( undefined !== module ) {

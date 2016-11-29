@@ -52,17 +52,24 @@ wss.on('connection', function(ws) {
                 x: 800,
                 y: 500,
                 player_type: player_type,
-                fire: false
+                fire: false,
+                life_perc: 1
             });
             ws.send(JSON.stringify({ id: player_id, players: players }));
         } else {
-            for (i in players)
+
+            if( incommingMsg.slime_killed !== undefined && incommingMsg.slime_killed.length ){
+                devil_obj.removeSlimeById( incommingMsg.slime_killed );
+            }
+            for (i in players){
                 if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
                     players[i].x = incommingMsg.x;
                     players[i].y = incommingMsg.y;
                     players[i].fire = incommingMsg.fire;
+                    players[i].life_perc = incommingMsg.life_perc;
                     break;
                 }
+            }
             devil_obj.updatePlayers(players[0]);
             for( i in webSockets ) {
                 if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
