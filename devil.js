@@ -219,11 +219,12 @@ Devil.prototype = {
             devilSlimeBody.addShape(devilSlimeShape);
             this.world.addBody(devilSlimeBody);
             devilSlimeShape.material = devilSlimeMaterial;
-            devilSlimeBody.damping = 0.5;
             devilSlimeBody.gravityScale = 350;
 
             var groundSlimeCM = new p2.ContactMaterial(this.groundMaterial, devilSlimeMaterial, {
-                friction: 0.0
+                friction: 0,
+                restitution: 0,
+                relaxation: 10
             });
             this.world.addContactMaterial(groundSlimeCM);
 
@@ -237,11 +238,13 @@ Devil.prototype = {
                 id: this.id_count++,
                 devilSlimeBody: devilSlimeBody
             });
+            if(this.id_count == 30){
+                this.id_count = 0;
+            }
             count = 0;
         }
         count++;
         if(count % Math.round(Math.random()*20) == 0) {
-
             if (this.checkIfCanJump(this.characterBody)) this.characterBody.velocity[1] = this.jumpSpeed;
         }
         //if (this.checkIfCanJump(this.characterBody) && this.buttons.space ) this.characterBody.velocity[1] = this.jumpSpeed;
@@ -256,7 +259,7 @@ Devil.prototype = {
                         ds.devilSlimeBody.velocity[0] = -this.walkSpeed;
                     }
                     if (-(ds.devilSlimeBody.position[1] + 100) > this.player.y) {
-                        if (this.checkIfCanJump(ds.devilSlimeBody)) ds.devilSlimeBody.velocity[1] = 500;
+                        // if (this.checkIfCanJump(ds.devilSlimeBody)) ds.devilSlimeBody.velocity[1] = 500;
                     }
                 }
             }.bind(this));
