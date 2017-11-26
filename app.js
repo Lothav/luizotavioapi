@@ -23,8 +23,7 @@ app.get('/getQuery', function(req, res) {
     pg.connect(connectionString, function(err, client, done) {
         client.query('SELECT * FROM anv', function(err, result) {
             done();
-            if(err) return console.error(err);
-            console.log(result.rows);
+            if(err) return res.send(err);
             res.send(result);
         });
     });
