@@ -31,94 +31,94 @@ app.get('/getQuery', function(req, res) {
 
 });
 
-
-/*  Web Socket  */
-
-var wss = new WebSocketServer({ server : server });
-var id = 0;
-
-var webSockets = [];
-var players = [];
-var devil = {
-    x: 64,
-    y: 80,
-    follow_id: 0
-};
-
-var devil_obj = new Devil(false, players[0], webSockets);
-
-wss.on('connection', function(ws) {
-    var i, name, player_type;
-    var player_id = id++;
-    webSockets[player_id]  = ws;
-
-    devil_obj.updateSockets(webSockets);
-
-    ws.on('message', function(message) {
-        var incommingMsg = JSON.parse(message);
-        /* First Mensage from player */
-        if( incommingMsg.name !== undefined ){
-            name = incommingMsg.name;
-            player_type = incommingMsg.player_type;
-            players.push({
-                id: player_id,
-                name: name,
-                x: 800,
-                y: 500,
-                player_type: player_type,
-                fire: false,
-                life_perc: 1
-            });
-            ws.send(JSON.stringify({ id: player_id, players: players }));
-        } else {
-
-            if( incommingMsg.slime_killed !== undefined && incommingMsg.slime_killed.length ){
-                devil_obj.removeSlimeById( incommingMsg.slime_killed );
-            }
-            for (i in players){
-                if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
-                    players[i].x = incommingMsg.x;
-                    players[i].y = incommingMsg.y;
-                    players[i].fire = incommingMsg.fire;
-                    players[i].life_perc = incommingMsg.life_perc;
-                    break;
-                }
-            }
-            devil_obj.updatePlayers(players[0]);
-            for( i in webSockets ) {
-                if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
-                    if( i != incommingMsg.id ){
-                        webSockets[i].send(JSON.stringify({ players: players }));
-                    } else {
-                        var online_players = [];
-                        players.forEach(function (p) {
-                            online_players.push(p.id);
-                        });
-                        webSockets[i].send(JSON.stringify({ online_players: online_players }));
-                    }
-                }
-            }
-        }
-    });
-    ws.on('close', function (close) {
-        for(var i = 0; i < players.length; i++){
-            if(players[i].id == player_id){
-                players.splice(i, 1);
-                break;
-            }
-        }
-        delete webSockets[player_id];
-        console.log('players '+ name +' disconnected: ' + close);
-    });
-    /*  Fist time connected : Send id to new players
-     and new players to the others playerss  */
-    ws.send(JSON.stringify({ id: player_id }));
-    for( i in wss.clients ) {
-        if( wss.clients.hasOwnProperty(i) ){
-            wss.clients[i].send(JSON.stringify({ players: players }));
-        }
-    }
-});
+//
+///*  Web Socket  */
+//
+//var wss = new WebSocketServer({ server : server });
+//var id = 0;
+//
+//var webSockets = [];
+//var players = [];
+//var devil = {
+//    x: 64,
+//    y: 80,
+//    follow_id: 0
+//};
+//
+//var devil_obj = new Devil(false, players[0], webSockets);
+//
+//wss.on('connection', function(ws) {
+//    var i, name, player_type;
+//    var player_id = id++;
+//    webSockets[player_id]  = ws;
+//
+//    devil_obj.updateSockets(webSockets);
+//
+//    ws.on('message', function(message) {
+//        var incommingMsg = JSON.parse(message);
+//        /* First Mensage from player */
+//        if( incommingMsg.name !== undefined ){
+//            name = incommingMsg.name;
+//            player_type = incommingMsg.player_type;
+//            players.push({
+//                id: player_id,
+//                name: name,
+//                x: 800,
+//                y: 500,
+//                player_type: player_type,
+//                fire: false,
+//                life_perc: 1
+//            });
+//            ws.send(JSON.stringify({ id: player_id, players: players }));
+//        } else {
+//
+//            if( incommingMsg.slime_killed !== undefined && incommingMsg.slime_killed.length ){
+//                devil_obj.removeSlimeById( incommingMsg.slime_killed );
+//            }
+//            for (i in players){
+//                if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
+//                    players[i].x = incommingMsg.x;
+//                    players[i].y = incommingMsg.y;
+//                    players[i].fire = incommingMsg.fire;
+//                    players[i].life_perc = incommingMsg.life_perc;
+//                    break;
+//                }
+//            }
+//            devil_obj.updatePlayers(players[0]);
+//            for( i in webSockets ) {
+//                if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
+//                    if( i != incommingMsg.id ){
+//                        webSockets[i].send(JSON.stringify({ players: players }));
+//                    } else {
+//                        var online_players = [];
+//                        players.forEach(function (p) {
+//                            online_players.push(p.id);
+//                        });
+//                        webSockets[i].send(JSON.stringify({ online_players: online_players }));
+//                    }
+//                }
+//            }
+//        }
+//    });
+//    ws.on('close', function (close) {
+//        for(var i = 0; i < players.length; i++){
+//            if(players[i].id == player_id){
+//                players.splice(i, 1);
+//                break;
+//            }
+//        }
+//        delete webSockets[player_id];
+//        console.log('players '+ name +' disconnected: ' + close);
+//    });
+//    /*  Fist time connected : Send id to new players
+//     and new players to the others playerss  */
+//    ws.send(JSON.stringify({ id: player_id }));
+//    for( i in wss.clients ) {
+//        if( wss.clients.hasOwnProperty(i) ){
+//            wss.clients[i].send(JSON.stringify({ players: players }));
+//        }
+//    }
+//});
 
 /*function calcDevilLocation(){
     if(players.length){
