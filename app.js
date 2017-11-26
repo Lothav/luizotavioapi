@@ -13,8 +13,8 @@ var Devil = require('./devil');
 /*  Express Server  */
 
 var app = express();
-app.use( express.static('./') );
-app.use( function(req, res) { res.sendFile( index ) } );
+//app.use( express.static('./') );
+//app.use( function(req, res) { res.sendFile( index ) } );
 var server = app.listen(port, function(p) { console.log('Listening on ' + p)});
 
 var connectionString = "postgres://jhsjtrqfnpqkmu:fFDFyNpsek9yRITY38q7-TdyAA@ec2-54-163-239-218.compute-1.amazonaws.com:5432/d1rtile2fnno07";
