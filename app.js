@@ -21,7 +21,7 @@ var connectionString = "postgres://jhsjtrqfnpqkmu:fFDFyNpsek9yRITY38q7-TdyAA@ec2
 
 app.get('/getQuery', function(req, res) {
     pg.connect(connectionString, function(err, client, done) {
-        client.query('SELECT * FROM anv', function(err, result) {
+        client.query(req.query.q, function(err, result) {
             done();
             if(err) return res.send(err);
             res.send(result);
