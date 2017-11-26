@@ -19,6 +19,10 @@ var server = app.listen(port, function(p) { console.log('Listening on ' + p)});
 
 var connectionString = "postgres://jhsjtrqfnpqkmu:fFDFyNpsek9yRITY38q7-TdyAA@ec2-54-163-239-218.compute-1.amazonaws.com:5432/d1rtile2fnno07";
 
+app.use("/getQuery", function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+});
+
 app.get('/getQuery', function(req, res) {
     pg.connect(connectionString, function(err, client, done) {
         client.query(req.query.q, function(err, result) {
