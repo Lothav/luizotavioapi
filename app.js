@@ -17,6 +17,20 @@ app.use( express.static('./') );
 app.use( function(req, res) { res.sendFile( index ) } );
 var server = app.listen(port, function(p) { console.log('Listening on ' + p)});
 
+var connectionString = "postgres://jhsjtrqfnpqkmu:fFDFyNpsek9yRITY38q7-TdyAA@ec2-54-163-239-218.compute-1.amazonaws.com:5432/d1rtile2fnno07";
+
+app.get('/getQuery', function(req, res) {
+    pg.connect(connectionString, function(err, client, done) {
+        client.query('SELECT * FROM anv', function(err, result) {
+            done();
+            if(err) return console.error(err);
+            console.log(result.rows);
+            res.send(result);
+        });
+    });
+
+});
+
 
 /*  Web Socket  */
 
