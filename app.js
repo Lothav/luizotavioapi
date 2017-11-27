@@ -25,10 +25,13 @@ app.use(function(req, res, next) {
 });
 
 app.get('/getQuery', function(req, res) {
+    var start = new Date().getTime();
     pg.connect(connectionString, function(err, client, done) {
         client.query(req.query.q, function(err, result) {
             done();
             if(err) return res.send(err);
+            var end = new Date().getTime();
+            result.time = end - start;
             res.send(result);
         });
     });
