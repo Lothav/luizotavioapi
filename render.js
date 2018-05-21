@@ -1,8 +1,8 @@
 function Render(devil_slimes, characterBody, planeBody, devilSlimeBody, platforms){
-    //this.canvas = document.getElementById("myCanvas");
-    //this.w = this.canvas.width;
-    //this.h = this.canvas.height;
-    //this.ctx = this.canvas.getContext("2d");
+    this.canvas = document.getElementById("myCanvas");
+    this.w = this.canvas.width;
+    this.h = this.canvas.height;
+    this.ctx = this.canvas.getContext("2d");
 
     this.devil_slimes = devil_slimes;
     this.platforms = platforms;
