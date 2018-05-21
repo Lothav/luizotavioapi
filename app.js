@@ -74,6 +74,7 @@ wss.on('connection', function(ws) {
             devil_obj.updatePlayers(players[0]);
 
             for( i in webSockets ) {
+
                 if (webSockets.hasOwnProperty(i) && webSockets[i].readyState == 1){
                     if( i != incommingMsg.id ){
                         webSockets[i].send(JSON.stringify({ players: players }));
