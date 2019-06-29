@@ -1,5 +1,5 @@
 libgif-dev
-gcc
+gcc-9
 libgomp
 libgomp1
 gcc-4.9
