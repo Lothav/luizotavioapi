@@ -59,7 +59,7 @@ wss.on('connection', function(ws) {
             }
 
 
-            
+
             for (i in players){
                 if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
                     players[i].x = incommingMsg.x;
