@@ -21,13 +21,14 @@ app.use(cors());
 
 app.post('/upload', upload.single('image'), (req, res) => {
     if (req.file){
+        console.log("Current dir " + __dirname);
         console.log("Request file: " + req.file.filename);
         const spawn = require("child_process").spawn;
-        const pythonProcess = spawn('python3', ["./model_loader.py", req.file.filename, "color"]);
+        const pythonProcess = spawn('python3', ["./model_loader.py", "/tmp/" + req.file.filename, "color"]);
         pythonProcess.stdout.on('data', (data) => {
             // Do something with the data returned from python script
             console.log("Classification: " + data);
-            res.json({ imageUrl: `/tmp/${req.file.filename}`, classification: "" + data });
+            res.json({ imageUrl: `${req.file.filename}`, classification: "" + data });
         });
     } else {
         console.log("No Files to Upload. Request: " + req);
