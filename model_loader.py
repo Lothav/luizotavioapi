@@ -1,8 +1,9 @@
+import xgboost
+
 import argparse as ap
 from pickle import load
 
 import numpy as np
-import xgboost
 from skimage.color import rgb2gray
 from skimage.feature import greycomatrix, greycoprops, hog, local_binary_pattern
 from skimage.io import imread
