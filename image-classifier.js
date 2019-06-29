@@ -34,6 +34,8 @@ app.post('/upload', upload.single('image'), (req, res) => {
     }
 });
 
+
+
 const PORT = 5000;
 
 app.listen(PORT);
