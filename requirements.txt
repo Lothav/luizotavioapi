@@ -39,7 +39,6 @@ jupyter-client==5.2.4
 jupyter-console==6.0.0
 jupyter-core==4.4.0
 kiwisolver==1.1.0
-lensfun==0.3.2
 lockfile==0.12.2
 Mako==1.0.12
 MarkupSafe==1.1.1
