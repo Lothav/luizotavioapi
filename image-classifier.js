@@ -17,7 +17,6 @@ let storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-
 app.use(cors());
 
 app.post('/upload', upload.single('image'), (req, res) => {
@@ -31,13 +30,12 @@ app.post('/upload', upload.single('image'), (req, res) => {
             res.json({ imageUrl: `/tmp/${req.file.filename}`, classification: "" + data });
         });
     } else {
+        console.log("No Files to Upload. Request: " + req);
         res.status("409").json("No Files to Upload.");
     }
 });
 
-
-
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT);
-console.log('api runnging on port: ' + PORT);
+console.log('Api running on port: ' + PORT);
