@@ -37,6 +37,7 @@ app.post('/upload', upload.single('image'), (req, res) => {
     }
 });
 
+// Heroku uses 'process.env.PORT'.
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT);
