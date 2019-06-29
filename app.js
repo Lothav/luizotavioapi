@@ -1,47 +1,42 @@
-var WebSocketServer = require('ws').Server;
-var express = require('express');
-var pg = require('pg'); /* Postgres */
-var path = require("path");
+let WebSocketServer = require('ws').Server;
+let express = require('express');
+let path = require("path");
 
-var p2 = require('p2');
+let port =  process.env.PORT || 3000;
+let index = path.join(__dirname, 'index.html');
 
-var port =  process.env.PORT || 3000;
-var index = path.join(__dirname, 'index.html');
-
-var Devil = require('./devil');
+let Devil = require('./devil');
 
 /*  Express Server  */
 
-var app = express();
+let app = express();
 app.use( express.static('./') );
 app.use( function(req, res) { res.sendFile( index ) } );
-var server = app.listen(port, function(p) { console.log('Listening on ' + p)});
-
+let server = app.listen(port, function(p) { console.log('Listening on ' + p)});
 
 /*  Web Socket  */
+let wss = new WebSocketServer({ server : server });
+let id = 0;
 
-var wss = new WebSocketServer({ server : server });
-var id = 0;
-
-var webSockets = [];
-var players = [];
-var devil = {
+let webSockets = [];
+let players = [];
+let devil = {
     x: 64,
     y: 80,
     follow_id: 0
 };
 
-var devil_obj = new Devil(false, players[0], webSockets);
+let devil_obj = new Devil(false, players[0], webSockets);
 
 wss.on('connection', function(ws) {
-    var i, name, player_type;
-    var player_id = id++;
+    let i, name, player_type;
+    let player_id = id++;
     webSockets[player_id]  = ws;
 
     devil_obj.updateSockets(webSockets);
 
     ws.on('message', function(message) {
-        var incommingMsg = JSON.parse(message);
+        let incommingMsg = JSON.parse(message);
         /* First Mensage from player */
         if( incommingMsg.name !== undefined ){
             name = incommingMsg.name;
@@ -79,7 +74,7 @@ wss.on('connection', function(ws) {
                     if( i != incommingMsg.id ){
                         webSockets[i].send(JSON.stringify({ players: players }));
                     } else {
-                        var online_players = [];
+                        let online_players = [];
                         players.forEach(function (p) {
                             online_players.push(p.id);
                         });
@@ -90,7 +85,7 @@ wss.on('connection', function(ws) {
         }
     });
     ws.on('close', function (close) {
-        for(var i = 0; i < players.length; i++){
+        for(let i = 0; i < players.length; i++){
             if(players[i].id == player_id){
                 players.splice(i, 1);
                 break;
@@ -111,7 +106,7 @@ wss.on('connection', function(ws) {
 
 /*function calcDevilLocation(){
     if(players.length){
-        var devil_to = Math.round( Math.random() * (wss.clients.length-1) );
+        let devil_to = Math.round( Math.random() * (wss.clients.length-1) );
         if( players[devil_to] !== undefined ){
             if( players[devil_to].x > devil.x ) devil.x++;
             else devil.x--;
@@ -121,7 +116,7 @@ wss.on('connection', function(ws) {
 }*/
 
 /*  Postgres DB */
-/*var config = {
+/*let config = {
  host:'ec2-54-163-239-218.compute-1.amazonaws.com',
  user: 'jhsjtrqfnpqkmu',
  database: 'd1rtile2fnno07',
@@ -131,7 +126,7 @@ wss.on('connection', function(ws) {
  idleTimeoutMillis: 30000
  };
 
- var pool = new pg.Pool(config);
+ let pool = new pg.Pool(config);
 
  pool.connect(function(err, client, done) {
  if(err) return console.error('error fetching client from pool', err);
