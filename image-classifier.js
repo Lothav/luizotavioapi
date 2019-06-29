@@ -17,6 +17,7 @@ let storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
 app.use(cors());
 
 app.post('/upload', upload.single('image'), (req, res) => {
