@@ -57,9 +57,7 @@ wss.on('connection', function(ws) {
             if( incommingMsg.slime_killed !== undefined && incommingMsg.slime_killed.length ){
                 devil_obj.removeSlimeById( incommingMsg.slime_killed );
             }
-
-
-
+            
             for (i in players){
                 if( players.hasOwnProperty(i) && players[i].id == incommingMsg.id ) {
                     players[i].x = incommingMsg.x;
