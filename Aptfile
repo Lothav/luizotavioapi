@@ -2,3 +2,4 @@ libgif-dev
 gcc
 libgomp
 libgomp1
+gcc-4.9
