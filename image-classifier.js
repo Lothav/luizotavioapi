@@ -21,10 +21,11 @@ app.use(cors());
 
 app.post('/upload', upload.single('image'), (req, res) => {
     if (req.file){
-        console.log("Current dir " + __dirname);
-        console.log("Request file: " + req.file.filename);
+        let method = req.query.method != null ? req.query.method : "color";
+        console.log("Request file: " + req.file.filename + " using method: " + method + ".");
+
         const spawn = require("child_process").spawn;
-        const pythonProcess = spawn('python3', ["./model_loader.py", "/tmp/" + req.file.filename, "color"]);
+        const pythonProcess = spawn('python3', ["./model_loader.py", "/tmp/" + req.file.filename, method]);
         pythonProcess.stdout.on('data', (data) => {
             // Do something with the data returned from python script
             console.log("Classification: " + data);
