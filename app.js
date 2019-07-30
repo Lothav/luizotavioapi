@@ -29,6 +29,7 @@ let devil = {
 
 let devil_obj = new Devil(false, players[0], webSockets);
 
+
 wss.on('connection', function(ws) {
     let i, name, player_type;
     let player_id = id++;
