@@ -24,7 +24,7 @@
     "jsdom": "^9.8.3"
   },
   "scripts": {
-    "start": "node image-classifier.js",
+    "start": "node app.js",
     "image-classifier": "node image-classifier.js"
   }
 }

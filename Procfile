@@ -1,1 +1,1 @@
-web node image-classifier.js
+web node app.js
